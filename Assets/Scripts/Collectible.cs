@@ -6,7 +6,6 @@ using UnityEngine;
 public class Collectible : MonoBehaviour
 {
     public int score;
-    private LevelManager _levelManager;
 
     [SerializeField] private float _moveSpeed;
 
@@ -14,9 +13,10 @@ public class Collectible : MonoBehaviour
     private bool _initialized;
     private bool _paused = false;
 
-    public void Init(LevelManager manager)
+    public void Init()
     {
-        _levelManager = manager;
+        _targetPosition = new Vector3(-30, transform.position.y, 0);
+        _initialized = true;
     }
     
     private void Update()
@@ -29,8 +29,8 @@ public class Collectible : MonoBehaviour
     private void FixedUpdate()
     {
         if (!_initialized || _paused) return;
-        if (!(transform.position.x <= _levelManager.xDestroyThreshold)) return;
-        _levelManager.RemoveCollectible(gameObject);
+        if (!(transform.position.x <= LevelManager.Instance.xDestroyThreshold)) return;
+        LevelManager.Instance.RemoveCollectible(gameObject);
         Destroy(gameObject);
     }
     
@@ -39,17 +39,19 @@ public class Collectible : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             ScoreManager.Instance.AddToScore(score);
+            LevelManager.Instance.collectibleHit?.Invoke();
+            LevelManager.Instance.RemoveCollectible(gameObject);
             Destroy(gameObject);
         }
     }
 
     public void Pause()
     {
-        
+        _paused = true;
     }
 
     public void Unpause()
     {
-        
+        _paused = false;
     }
 }

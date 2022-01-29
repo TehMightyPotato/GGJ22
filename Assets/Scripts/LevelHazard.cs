@@ -6,7 +6,6 @@ using UnityEngine.PlayerLoop;
 
 public class LevelHazard : MonoBehaviour
 {
-    private LevelManager _levelManager;
 
     [SerializeField] private float _moveSpeed;
 
@@ -14,9 +13,8 @@ public class LevelHazard : MonoBehaviour
     private bool _initialized;
     private bool _paused = false;
 
-    public void Init(LevelManager manager)
+    public void Init()
     {
-        _levelManager = manager;
         _targetPosition = new Vector3(-30, transform.position.y, 0);
         _initialized = true;
     }
@@ -32,8 +30,8 @@ public class LevelHazard : MonoBehaviour
     private void FixedUpdate()
     {
         if (!_initialized || _paused) return;
-        if (!(transform.position.x <= _levelManager.xDestroyThreshold)) return;
-        _levelManager.RemoveHazard(gameObject);
+        if (!(transform.position.x <= LevelManager.Instance.xDestroyThreshold)) return;
+        LevelManager.Instance.RemoveHazard(gameObject);
         Destroy(gameObject);
     }
 
@@ -41,7 +39,7 @@ public class LevelHazard : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            _levelManager.hazardHit.Invoke();
+            LevelManager.Instance.hazardHit?.Invoke();
         }
     }
 
