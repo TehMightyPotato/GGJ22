@@ -29,6 +29,7 @@ public class LevelManager : Singleton<LevelManager>
     private void Start()
     {
         StartCoroutine(SpawnIntervalRoutine());
+        hazardHit.AddListener(Pause);
     }
 
 
@@ -46,14 +47,14 @@ public class LevelManager : Singleton<LevelManager>
         var prefab = _collectiblePrefabs.GetRandom();
         var obj = Instantiate(prefab, new Vector3(20, UnityEngine.Random.Range(_lowerLimit, _upperLimit), 0),
             quaternion.identity);
-        
+        AddCollectible(obj);
     }
 
 
     public void AddHazard(GameObject obj)
     {
         _levelHazards.Add(obj);
-        obj.GetComponent<LevelHazard>().Init(this);
+        obj.GetComponent<LevelHazard>().Init();
     }
 
     public void RemoveHazard(GameObject obj)
@@ -64,8 +65,9 @@ public class LevelManager : Singleton<LevelManager>
     public void AddCollectible(GameObject obj)
     {
         _levelCollectibles.Add(obj);
-        obj.GetComponent<Collectible>().Init(this);
-    }    
+        obj.GetComponent<Collectible>().Init();
+    }
+
     public void RemoveCollectible(GameObject obj)
     {
         _levelCollectibles.Remove(obj);
@@ -74,10 +76,12 @@ public class LevelManager : Singleton<LevelManager>
     [ButtonMethod]
     public void Pause()
     {
+        doSpawn = false;
         foreach (var hazard in _levelHazards)
         {
             hazard.GetComponent<LevelHazard>().Pause();
         }
+
         foreach (var collectible in _levelCollectibles)
         {
             collectible.GetComponent<Collectible>().Pause();
@@ -87,6 +91,7 @@ public class LevelManager : Singleton<LevelManager>
     [ButtonMethod]
     public void Unpause()
     {
+        doSpawn = true;
         foreach (var hazard in _levelHazards)
         {
             hazard.GetComponent<LevelHazard>().Unpause();
@@ -120,26 +125,22 @@ public class LevelManager : Singleton<LevelManager>
     {
         while (true)
         {
-            if (doSpawn)
+            var spawnAmount = UnityEngine.Random.Range(1, currentDifficulty + 2);
+            for (int i = 0; i < spawnAmount; i++)
             {
-                var spawnAmount = UnityEngine.Random.Range(1, currentDifficulty + 2);
-                for (int i = 0; i < spawnAmount; i++)
-                {
-                    SpawnHazard();
-                }
+                if (!doSpawn) continue;
+                SpawnHazard();
+            }
 
-                yield return new WaitForSeconds(_maxDifficulty - currentDifficulty + 1 / 2);
-                var collectibleAmount = UnityEngine.Random.Range(0, 2);
-                for (int i = 0; i < collectibleAmount; i++)
-                {
-                    
-                }
-                yield return new WaitForSeconds(_maxDifficulty - currentDifficulty + 1 / 2);
-            }
-            else
+            yield return new WaitForSeconds((_maxDifficulty - currentDifficulty + 1) / 2f);
+            var collectibleAmount = UnityEngine.Random.Range(0, 2);
+            for (int i = 0; i < collectibleAmount; i++)
             {
-                yield return new WaitForEndOfFrame();
+                if (!doSpawn) continue;
+                SpawnCollectible();
             }
+
+            yield return new WaitForSeconds((_maxDifficulty - currentDifficulty + 1) / 2f);
         }
     }
 }

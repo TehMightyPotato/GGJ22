@@ -18,20 +18,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Vector3 _jumpVector;
     [SerializeField] private float _jumpMagnitude;
     [SerializeField] private ForceMode _jumpForceMode;
-    [SerializeField] private float _maxForceMagnitude;
-    [SerializeField] private Vector3 _upperPosition;
-    [SerializeField] private Vector3 _lowerPosition;
 
     [Header("Runtime")]
     [SerializeField] private Side _currentSide;
 
-    [Header("Events")] 
-    public UnityEvent onJumpStarted;
-    public UnityEvent onJumpEnded;
-
     private void Awake()
     {
         _waitForFixedUpdate = new WaitForFixedUpdate();
+        LevelManager.Instance.hazardHit.AddListener(() =>
+        {
+            _gameInput.Disable();
+            _ownRigidBody.isKinematic = true;
+        });
         _currentSide = Side.Up;
     }
 
@@ -76,7 +74,6 @@ public class PlayerController : MonoBehaviour
     }
 
 }
-
 
 public enum Side
 {

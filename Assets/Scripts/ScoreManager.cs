@@ -8,6 +8,7 @@ using UnityEngine.Events;
 public class ScoreManager : Singleton<ScoreManager>
 {
     private int _score;
+    private bool gameOver = false;
 
     public int Score
     {
@@ -23,6 +24,7 @@ public class ScoreManager : Singleton<ScoreManager>
 
     private void Start()
     {
+        LevelManager.Instance.hazardHit.AddListener(() => { gameOver = true; });
         Score = 0;
         StartCoroutine(ScoreOverTimeRoutine());
     }
@@ -32,11 +34,11 @@ public class ScoreManager : Singleton<ScoreManager>
         Score += amount;
     }
 
-
     private IEnumerator ScoreOverTimeRoutine()
     {
         while (true)
         {
+            if (gameOver) yield break;
             AddToScore(LevelManager.Instance.currentDifficulty + 1);
             yield return new WaitForSeconds(0.5f);
         }
