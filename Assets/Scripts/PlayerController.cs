@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody _ownRigidBody;
     [SerializeField] private Animator _ownAnimator;
     [SerializeField] private Animator _cloneAnimator;
+    [SerializeField] private AudioSource _deathAudioSource;
+    [SerializeField] private AudioSource _jumpAudioSource;
     [SerializeField] private GameInput _gameInput;
     private WaitForFixedUpdate _waitForFixedUpdate;
     
@@ -36,6 +38,7 @@ public class PlayerController : MonoBehaviour
         {
             _gameInput.Disable();
             _ownRigidBody.isKinematic = true;
+            _deathAudioSource.Play();
             _ownAnimator.SetTrigger(DieAnimatorIndex);
             _cloneAnimator.SetTrigger(DieAnimatorIndex);
         });
@@ -57,6 +60,7 @@ public class PlayerController : MonoBehaviour
         _ownAnimator.SetTrigger(JumpAnimatorIndex);
         _cloneAnimator.SetTrigger(JumpAnimatorIndex);
         var vector = _jumpVector * _jumpMagnitude;
+        _jumpAudioSource.Play();
         if (_currentSide == Side.Down)
         {
             vector *= -1;
