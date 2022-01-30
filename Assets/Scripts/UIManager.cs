@@ -8,22 +8,27 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private Text _scoreText;
-    [SerializeField] private GameObject _restartButton;
+    [SerializeField] private GameObject _deathMenu;
     
     private void OnEnable()
     {
         ScoreManager.Instance.scoreChanged.AddListener(UpdateScoreText);
-        LevelManager.Instance.hazardHit.AddListener(()=>{_restartButton.SetActive(true);});
+        LevelManager.Instance.hazardHit.AddListener(()=>{_deathMenu.SetActive(true);});
     }
     
 
     private void UpdateScoreText(int currentScore)
     {
-        _scoreText.text = "Score: " + currentScore;
+        _scoreText.text = currentScore.ToString();
     }
 
     public void RestartScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ExitToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

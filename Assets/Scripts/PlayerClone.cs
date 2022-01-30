@@ -5,8 +5,11 @@ using UnityEngine;
 public class PlayerClone : MonoBehaviour
 {
     [SerializeField] private GameObject _player;
+
     void Update()
     {
-        transform.position = -_player.transform.position;
+        var ownTransform = transform;
+        ownTransform.position = -_player.transform.position;
+        ownTransform.eulerAngles = -_player.transform.rotation.eulerAngles;
     }
 }

@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Rigidbody _ownRigidBody;
+    [SerializeField] private Animator _ownAnimator;
+    [SerializeField] private Animator _cloneAnimator;
     [SerializeField] private GameInput _gameInput;
     private WaitForFixedUpdate _waitForFixedUpdate;
     
@@ -22,6 +24,11 @@ public class PlayerController : MonoBehaviour
     [Header("Runtime")]
     [SerializeField] private Side _currentSide;
 
+    private static readonly int JumpAnimatorIndex = Animator.StringToHash("Jump");
+    private static readonly int ActivateAnimatorIndex = Animator.StringToHash("Activate");
+    private static readonly int DeactivateAnimatorIndex = Animator.StringToHash("Deactivate");
+    private static readonly int DieAnimatorIndex = Animator.StringToHash("Die");
+
     private void Awake()
     {
         _waitForFixedUpdate = new WaitForFixedUpdate();
@@ -29,6 +36,8 @@ public class PlayerController : MonoBehaviour
         {
             _gameInput.Disable();
             _ownRigidBody.isKinematic = true;
+            _ownAnimator.SetTrigger(DieAnimatorIndex);
+            _cloneAnimator.SetTrigger(DieAnimatorIndex);
         });
         _currentSide = Side.Up;
     }
@@ -45,6 +54,8 @@ public class PlayerController : MonoBehaviour
     {
         if (!callbackContext.performed) yield break;
         yield return _waitForFixedUpdate;
+        _ownAnimator.SetTrigger(JumpAnimatorIndex);
+        _cloneAnimator.SetTrigger(JumpAnimatorIndex);
         var vector = _jumpVector * _jumpMagnitude;
         if (_currentSide == Side.Down)
         {
@@ -60,15 +71,19 @@ public class PlayerController : MonoBehaviour
         {
             case Side.Up:
                 Physics.gravity = new Vector3(0,9.81f);
+                transform.eulerAngles = new Vector3(0, 0, 180);
                 _currentSide = Side.Down;
                 break;
             case Side.Down:
+                transform.eulerAngles = new Vector3(0, 0, 0);
                 Physics.gravity = new Vector3(0,-9.81f);
                 _currentSide = Side.Up;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        _ownAnimator.SetTrigger(ActivateAnimatorIndex);
+        _cloneAnimator.SetTrigger(DeactivateAnimatorIndex);
         _ownRigidBody.position = -_ownRigidBody.position;
         _ownRigidBody.velocity = -_ownRigidBody.velocity;
     }

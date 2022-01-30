@@ -29,6 +29,13 @@ public class LevelManager : Singleton<LevelManager>
     private void Start()
     {
         StartCoroutine(SpawnIntervalRoutine());
+        ScoreManager.Instance.scoreChanged.AddListener((score) =>
+        {
+            if (score > currentDifficulty * 100 + 100)
+            {
+                RaiseDifficulty();
+            }
+        });
         hazardHit.AddListener(Pause);
     }
 
