@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.PlayerLoop;
+using UnityEngine.VFX;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Animator _cloneAnimator;
     [SerializeField] private AudioSource _deathAudioSource;
     [SerializeField] private AudioSource _jumpAudioSource;
+    [SerializeField] private VisualEffect _playerTrail;
+    [SerializeField] private Transform _visualTransform;
     [SerializeField] private GameInput _gameInput;
     private WaitForFixedUpdate _waitForFixedUpdate;
     
@@ -30,6 +33,12 @@ public class PlayerController : MonoBehaviour
     private static readonly int ActivateAnimatorIndex = Animator.StringToHash("Activate");
     private static readonly int DeactivateAnimatorIndex = Animator.StringToHash("Deactivate");
     private static readonly int DieAnimatorIndex = Animator.StringToHash("Die");
+
+
+    private void Update()
+    {
+        _playerTrail.SetVector3("TrailSpawnPosition", transform.position);
+    }
 
     private void Awake()
     {
@@ -75,11 +84,11 @@ public class PlayerController : MonoBehaviour
         {
             case Side.Up:
                 Physics.gravity = new Vector3(0,9.81f);
-                transform.eulerAngles = new Vector3(0, 0, 180);
+                _visualTransform.eulerAngles = new Vector3(0, 0, 180);
                 _currentSide = Side.Down;
                 break;
             case Side.Down:
-                transform.eulerAngles = new Vector3(0, 0, 0);
+                _visualTransform.eulerAngles = new Vector3(0, 0, 0);
                 Physics.gravity = new Vector3(0,-9.81f);
                 _currentSide = Side.Up;
                 break;
