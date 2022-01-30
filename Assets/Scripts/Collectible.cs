@@ -12,6 +12,7 @@ public class Collectible : MonoBehaviour
     private Vector3 _targetPosition;
     private bool _initialized;
     private bool _paused = false;
+    [SerializeField] private AudioSource _ownSource;
 
     public void Init()
     {
@@ -34,13 +35,16 @@ public class Collectible : MonoBehaviour
         Destroy(gameObject);
     }
     
-    private void OnTriggerEnter(Collider other)
+    private IEnumerator OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             ScoreManager.Instance.AddToScore(score);
             LevelManager.Instance.collectibleHit?.Invoke();
             LevelManager.Instance.RemoveCollectible(gameObject);
+            gameObject.GetComponent<MeshRenderer>().enabled = false;
+            _ownSource.Play();
+            yield return new WaitUntil(() => !_ownSource.isPlaying);
             Destroy(gameObject);
         }
     }
