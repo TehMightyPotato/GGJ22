@@ -42,7 +42,7 @@ public class Collectible : MonoBehaviour
             ScoreManager.Instance.AddToScore(score);
             LevelManager.Instance.collectibleHit?.Invoke();
             LevelManager.Instance.RemoveCollectible(gameObject);
-            gameObject.GetComponent<MeshRenderer>().enabled = false;
+            gameObject.GetComponent<Renderer>().enabled = false;
             _ownSource.Play();
             yield return new WaitUntil(() => !_ownSource.isPlaying);
             Destroy(gameObject);
